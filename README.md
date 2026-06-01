@@ -2,7 +2,7 @@
 
 A lightweight Italian language learning app with vocabulary flashcards, grammar lessons, quizzes, and progress tracking.
 
-**Live demo**: https://teofantsi.github.io/italian-app
+**Live demo**: [https://teofantsi.github.io/italian-app](https://teofantsi.github.io/Italian-learn/)
 
 ## Features
 
