@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Italian Learning App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f5f4;
+      --bg3: #eeede8;
+      --text: #1a1a18;
+      --text2: #5f5e5a;
+      --text3: #888780;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --green: #1D9E75;
+      --green-bg: #E1F5EE;
+      --green-text: #085041;
+      --red: #D85A30;
+      --red-bg: #FAECE7;
+      --red-text: #712B13;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg2: #252523;
+        --bg3: #2e2e2b;
+        --text: #f0efe9;
+        --text2: #b4b2a9;
+        --text3: #888780;
+        --border: rgba(255,255,255,0.1);
+        --border2: rgba(255,255,255,0.2);
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg3);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .header { margin-bottom: 24px; }
+    .header h1 { font-size: 24px; font-weight: 500; margin-bottom: 4px; }
+    .header p { font-size: 14px; color: var(--text2); }
+
+    nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+      background: var(--bg2);
+      padding: 4px;
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+    }
+
+    nav button {
+      flex: 1;
+      padding: 8px 4px;
+      border-radius: var(--radius);
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all .15s;
+    }
+
+    nav button.active {
+      background: var(--bg);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    nav button i { font-size: 15px; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+    .stat-val { font-size: 26px; font-weight: 500; }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .tag.animals  { background: #E1F5EE; color: #085041; }
+    .tag.food     { background: #FAEEDA; color: #633806; }
+    .tag.home     { background: #EEEDFE; color: #3C3489; }
+    .tag.verbs    { background: #FAECE7; color: #712B13; }
+    .tag.travel   { background: #E6F1FB; color: #0C447C; }
+    .tag.adjectives { background: #EAF3DE; color: #27500A; }
+    .tag.objects  { background: #F1EFE8; color: #444441; }
+    .tag.default  { background: var(--bg2); color: var(--text2); }
+
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .filter-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 0.5px solid var(--border2);
+      background: transparent;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text2);
+      transition: all .15s;
+    }
+
+    .filter-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .flip-card {
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px;
+      cursor: pointer;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      margin-bottom: 16px;
+      transition: background .15s;
+      user-select: none;
+    }
+
+    .flip-card:hover { background: var(--bg2); }
+    .word-it { font-size: 38px; font-weight: 500; margin-bottom: 10px; }
+    .word-en { font-size: 24px; color: var(--green); font-weight: 500; margin-top: 14px; }
+    .hint { font-size: 13px; color: var(--text3); margin-top: 10px; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    button.btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    button.btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 0.5px solid var(--border2);
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button.btn-success {
+      background: var(--green);
+      color: var(--green-bg);
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    button.btn-danger {
+      background: var(--red);
+      color: var(--red-bg);
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .fc-counter { text-align: center; font-size: 13px; color: var(--text3); }
+
+    .quiz-question {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 20px;
+    }
+
+    .quiz-word {
+      text-align: center;
+      padding: 28px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+    }
+
+    .quiz-word p:first-child { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+    .quiz-word .big { font-size: 34px; font-weight: 500; }
+
+    .quiz-opt {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+      text-align: left;
+      transition: background .12s;
+    }
+
+    .quiz-opt:hover:not(:disabled) { background: var(--bg2); }
+    .quiz-opt.correct { background: var(--green-bg); border-color: var(--green); color: var(--green-text); }
+    .quiz-opt.wrong   { background: var(--red-bg);   border-color: var(--red);   color: var(--red-text); }
+
+    .quiz-result {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .quiz-result .big-score { font-size: 48px; font-weight: 500; margin-bottom: 8px; }
+    .quiz-result p { color: var(--text2); margin-bottom: 24px; }
+
+    .grammar-item {
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .grammar-header {
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg);
+      user-select: none;
+    }
+
+    .grammar-header:hover { background: var(--bg2); }
+
+    .grammar-header .title { font-size: 15px; font-weight: 500; }
+
+    .grammar-body {
+      padding: 16px;
+      border-top: 0.5px solid var(--border);
+      background: var(--bg2);
+      display: none;
+    }
+
+    .grammar-body.open { display: block; }
+    .grammar-body .explanation { font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+
+    .example {
+      padding: 10px 14px;
+      border-left: 2px solid var(--green);
+      background: var(--bg);
+      font-size: 14px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      border-radius: 0;
+    }
+
+    .prog-bar-bg {
+      background: var(--bg3);
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prog-bar {
+      height: 8px;
+      border-radius: 20px;
+      background: var(--green);
+      transition: width .4s;
+    }
+
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+      align-items: center;
+    }
+
+    .danger-zone {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .chevron { transition: transform .2s; font-size: 16px; color: var(--text3); }
+    .chevron.open { transform: rotate(180deg); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>Italian</h1>
+    <p>Vocabulary flashcards, grammar lessons, and quizzes</p>
+  </div>
+
+  <nav>
+    <button class="active" onclick="showScreen('flashcards',this)">
+      <i class="ti ti-cards"></i> Flashcards
+    </button>
+    <button onclick="showScreen('quiz',this)">
+      <i class="ti ti-help"></i> Quiz
+    </button>
+    <button onclick="showScreen('grammar',this)">
+      <i class="ti ti-book"></i> Grammar
+    </button>
+    <button onclick="showScreen('progress',this)">
+      <i class="ti ti-chart-bar"></i> Progress
+    </button>
+  </nav>
+
+  <!-- FLASHCARDS -->
+  <div id="flashcards" class="screen active">
+    <div class="filter-row" id="fc-filters"></div>
+    <div class="flip-card" id="fc-card" onclick="revealCard()">
+      <div class="word-it" id="fc-italian"></div>
+      <span class="tag" id="fc-tag"></span>
+      <div id="fc-reveal" style="display:none">
+        <div class="word-en" id="fc-english"></div>
+      </div>
+      <div class="hint" id="fc-hint">tap to reveal</div>
+    </div>
+    <div class="btn-row" id="fc-btns" style="display:none">
+      <button class="btn-danger" onclick="markCard(false)"><i class="ti ti-x"></i> Missed</button>
+      <button class="btn-outline" onclick="nextCard()">Skip</button>
+      <button class="btn-success" onclick="markCard(true)"><i class="ti ti-check"></i> Got it</button>
+    </div>
+    <div class="fc-counter" id="fc-counter"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div id="quiz-inner"></div>
+  </div>
+
+  <!-- GRAMMAR -->
+  <div id="grammar" class="screen">
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px">Tap any topic to expand the lesson.</p>
+    <div id="grammar-list"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress" class="screen">
+    <div class="stat-grid" id="stats-grid"></div>
+    <div class="card">
+      <p style="font-size:14px;font-weight:500;margin-bottom:16px">Vocabulary by category</p>
+      <div id="cat-progress"></div>
+    </div>
+    <div class="danger-zone">
+      <button class="btn-outline" style="width:100%" onclick="resetProgress()">Reset all progress</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const VOCAB = [
+  {id:1,it:'cane',en:'dog',cat:'animals',diff:1},
+  {id:2,it:'gatto',en:'cat',cat:'animals',diff:1},
+  {id:3,it:'uccello',en:'bird',cat:'animals',diff:1},
+  {id:4,it:'pesce',en:'fish',cat:'animals',diff:1},
+  {id:5,it:'cavallo',en:'horse',cat:'animals',diff:2},
+  {id:6,it:'casa',en:'house',cat:'home',diff:1},
+  {id:7,it:'tavolo',en:'table',cat:'home',diff:1},
+  {id:8,it:'sedia',en:'chair',cat:'home',diff:1},
+  {id:9,it:'finestra',en:'window',cat:'home',diff:1},
+  {id:10,it:'porta',en:'door',cat:'home',diff:1},
+  {id:11,it:'acqua',en:'water',cat:'food',diff:1},
+  {id:12,it:'pane',en:'bread',cat:'food',diff:1},
+  {id:13,it:'vino',en:'wine',cat:'food',diff:1},
+  {id:14,it:'caffè',en:'coffee',cat:'food',diff:1},
+  {id:15,it:'formaggio',en:'cheese',cat:'food',diff:1},
+  {id:16,it:'frutta',en:'fruit',cat:'food',diff:1},
+  {id:17,it:'libro',en:'book',cat:'objects',diff:1},
+  {id:18,it:'telefono',en:'phone',cat:'objects',diff:1},
+  {id:19,it:'treno',en:'train',cat:'travel',diff:1},
+  {id:20,it:'città',en:'city',cat:'travel',diff:1},
+  {id:21,it:'strada',en:'street',cat:'travel',diff:1},
+  {id:22,it:'aereo',en:'plane',cat:'travel',diff:1},
+  {id:23,it:'mangiare',en:'to eat',cat:'verbs',diff:1},
+  {id:24,it:'bere',en:'to drink',cat:'verbs',diff:1},
+  {id:25,it:'parlare',en:'to speak',cat:'verbs',diff:1},
+  {id:26,it:'andare',en:'to go',cat:'verbs',diff:1},
+  {id:27,it:'dormire',en:'to sleep',cat:'verbs',diff:1},
+  {id:28,it:'leggere',en:'to read',cat:'verbs',diff:2},
+  {id:29,it:'scrivere',en:'to write',cat:'verbs',diff:2},
+  {id:30,it:'capire',en:'to understand',cat:'verbs',diff:2},
+  {id:31,it:'grande',en:'big',cat:'adjectives',diff:1},
+  {id:32,it:'piccolo',en:'small',cat:'adjectives',diff:1},
+  {id:33,it:'bello',en:'beautiful',cat:'adjectives',diff:1},
+  {id:34,it:'buono',en:'good',cat:'adjectives',diff:1},
+  {id:35,it:'nuovo',en:'new',cat:'adjectives',diff:1},
+  {id:36,it:'vecchio',en:'old',cat:'adjectives',diff:1},
+  {id:37,it:'rosso',en:'red',cat:'adjectives',diff:1},
+  {id:38,it:'blu',en:'blue',cat:'adjectives',diff:1},
+];
+
+const GRAMMAR = [
+  {id:1,title:'Present tense — -are verbs',diff:1,
+   explanation:'Remove -are and add endings: io→-o, tu→-i, lui/lei→-a, noi→-iamo, voi→-ate, loro→-ano.',
+   examples:['Io parlo italiano. — I speak Italian.','Tu mangi la pizza. — You eat pizza.','Noi amiamo la musica. — We love music.','Loro lavorano molto. — They work a lot.']},
+  {id:2,title:'Present tense — -ere and -ire verbs',diff:1,
+   explanation:'-ere: io -o, tu -i, lui -e, noi -iamo, voi -ete, loro -ono. -ire is the same but voi takes -ite.',
+   examples:['Io prendo un caffè. — I take a coffee.','Lei scrive una lettera. — She writes a letter.','Voi partite domani. — You all leave tomorrow.','Loro dormono tardi. — They sleep late.']},
+  {id:3,title:'Definite articles — il, la, lo, i, le, gli',diff:1,
+   explanation:'Masc sg: il (consonant), lo (z / s+consonant), l\' (vowel). Fem sg: la, l\'. Plural: i/gli (masc), le (fem).',
+   examples:['Il cane è grande. — The dog is big.','La casa è bella. — The house is beautiful.','Lo studente studia. — The student studies.','Gli amici arrivano. — The friends arrive.']},
+  {id:4,title:'Essere — to be',diff:1,
+   explanation:'Irregular. sono, sei, è, siamo, siete, sono. Used for identity, origin, characteristics.',
+   examples:['Io sono italiano. — I am Italian.','Tu sei stanco? — Are you tired?','Lei è medica. — She is a doctor.','Siamo amici. — We are friends.']},
+  {id:5,title:'Avere — to have',diff:1,
+   explanation:'Irregular. ho, hai, ha, abbiamo, avete, hanno. Used for possession and feeling expressions.',
+   examples:['Ho una macchina. — I have a car.','Hai fame? — Are you hungry?','Abbiamo sete. — We are thirsty.','Hanno freddo. — They are cold.']},
+  {id:6,title:'Passato prossimo — past tense',diff:2,
+   explanation:'avere/essere + past participle. Most verbs use avere. Motion verbs use essere — participle agrees with subject.',
+   examples:['Ho mangiato la pasta. — I ate pasta.','Hai parlato con lui? — Did you speak with him?','Siamo andati al cinema. — We went to the cinema.','Lei è arrivata tardi. — She arrived late.']},
+  {id:7,title:'Adjective agreement',diff:1,
+   explanation:'Adjectives agree with the noun in gender and number: -o/-a/-i/-e for most. Adjectives ending in -e are the same for masc/fem.',
+   examples:['Un libro nuovo. — A new book.','Una casa nuova. — A new house.','Libri nuovi. — New books.','Un film interessante. — An interesting film.']},
+  {id:8,title:'Negation with non',diff:1,
+   explanation:'Place non before the verb. Double negatives are standard: non…mai (never), non…niente (nothing).',
+   examples:['Non parlo spagnolo. — I do not speak Spanish.','Non ho fame. — I am not hungry.','Non mangio mai la carne. — I never eat meat.','Non ho visto niente. — I saw nothing.']},
+];
+
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem('it_prog')||'{}') }catch(e){ return {} } }
+function saveProgress(p){ localStorage.setItem('it_prog', JSON.stringify(p)) }
+
+let progress = loadProgress();
+let fcList = [...VOCAB];
+let fcIndex = 0;
+let fcRevealed = false;
+let quizState = null;
+
+function showScreen(id, btn){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id === 'progress') renderProgress();
+  if(id === 'quiz' && !quizState) startQuiz();
+}
+
+// ── FLASHCARDS ────────────────────────────────────────────
+const CATS = ['all','animals','food','home','verbs','adjectives','travel','objects'];
+
+function initFlashcards(){
+  const row = document.getElementById('fc-filters');
+  CATS.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'filter-btn' + (c==='all' ? ' active' : '');
+    b.textContent = c === 'all' ? 'All words' : c;
+    b.onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      fcList = c === 'all' ? [...VOCAB] : VOCAB.filter(w => w.cat === c);
+      fcList.sort(() => Math.random() - .5);
+      fcIndex = 0; fcRevealed = false;
+      renderCard();
+    };
+    row.appendChild(b);
+  });
+  fcList.sort(() => Math.random() - .5);
+  renderCard();
+}
+
+function renderCard(){
+  if(!fcList.length) return;
+  const w = fcList[fcIndex % fcList.length];
+  document.getElementById('fc-italian').textContent = w.it;
+  const tag = document.getElementById('fc-tag');
+  tag.textContent = w.cat;
+  tag.className = 'tag ' + w.cat;
+  document.getElementById('fc-english').textContent = w.en;
+  document.getElementById('fc-reveal').style.display = 'none';
+  document.getElementById('fc-hint').textContent = 'tap to reveal';
+  document.getElementById('fc-btns').style.display = 'none';
+  document.getElementById('fc-counter').textContent = (fcIndex % fcList.length + 1) + ' / ' + fcList.length;
+  fcRevealed = false;
+}
+
+function revealCard(){
+  if(fcRevealed) return;
+  fcRevealed = true;
+  document.getElementById('fc-reveal').style.display = 'block';
+  document.getElementById('fc-hint').textContent = '';
+  document.getElementById('fc-btns').style.display = 'flex';
+}
+
+function markCard(correct){
+  const w = fcList[fcIndex % fcList.length];
+  if(!progress[w.id]) progress[w.id] = {c:0, w:0};
+  correct ? progress[w.id].c++ : progress[w.id].w++;
+  saveProgress(progress);
+  fcIndex++;
+  renderCard();
+}
+
+function nextCard(){ fcIndex++; fcRevealed = false; renderCard(); }
+
+// ── QUIZ ──────────────────────────────────────────────────
+function startQuiz(){
+  const pool = [...VOCAB].sort(() => Math.random() - .5).slice(0, 10);
+  quizState = { pool, qi: 0, score: 0, answered: false };
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const { pool, qi, score } = quizState;
+  const el = document.getElementById('quiz-inner');
+  if(qi >= pool.length){
+    const msg = score >= 8 ? 'Ottimo lavoro!' : score >= 5 ? 'Bene! Keep practising.' : 'Keep going — practice makes perfect.';
+    el.innerHTML = `<div class="quiz-result">
+      <div class="big-score">${score}/${pool.length}</div>
+      <p>${msg}</p>
+      <button class="btn-primary" onclick="startQuiz()">New quiz</button>
+    </div>`;
+    return;
+  }
+  const word = pool[qi];
+  const wrong = VOCAB.filter(v => v.id !== word.id).sort(() => Math.random() - .5).slice(0, 3);
+  const opts = [...wrong, word].sort(() => Math.random() - .5);
+  el.innerHTML = `
+    <div class="quiz-question">Question ${qi+1} of ${pool.length} &nbsp;·&nbsp; Score: ${score}</div>
+    <div class="quiz-word">
+      <p>What does this mean?</p>
+      <p class="big">${word.it}</p>
+      <span class="tag ${word.cat}" style="margin-top:8px">${word.cat}</span>
+    </div>
+    ${opts.map(o => `<button class="quiz-opt" id="qo-${o.id}" onclick="answerQuiz(${word.id},${o.id})">${o.en}</button>`).join('')}
+  `;
+  quizState.answered = false;
+}
+
+function answerQuiz(correctId, chosenId){
+  if(quizState.answered) return;
+  quizState.answered = true;
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+  document.getElementById('qo-'+correctId).classList.add('correct');
+  if(chosenId !== correctId) document.getElementById('qo-'+chosenId).classList.add('wrong');
+  if(chosenId === correctId){
+    quizState.score++;
+    const w = VOCAB.find(v => v.id === correctId);
+    if(!progress[w.id]) progress[w.id] = {c:0, w:0};
+    progress[w.id].c++;
+    saveProgress(progress);
+  }
+  setTimeout(() => { quizState.qi++; renderQuiz(); }, 900);
+}
+
+// ── GRAMMAR ───────────────────────────────────────────────
+function renderGrammar(){
+  const el = document.getElementById('grammar-list');
+  el.innerHTML = '';
+  GRAMMAR.forEach(g => {
+    const div = document.createElement('div');
+    div.className = 'grammar-item';
+    div.innerHTML = `
+      <div class="grammar-header" onclick="toggleGrammar(${g.id})">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="title">${g.title}</span>
+          <span class="tag ${g.diff===1?'animals':'travel'}" style="font-size:11px">${g.diff===1?'beginner':'intermediate'}</span>
+        </div>
+        <i class="ti ti-chevron-down chevron" id="gi-${g.id}"></i>
+      </div>
+      <div class="grammar-body" id="gb-${g.id}">
+        <p class="explanation">${g.explanation}</p>
+        ${g.examples.map(e => `<div class="example">${e}</div>`).join('')}
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function toggleGrammar(id){
+  const body = document.getElementById('gb-'+id);
+  const icon = document.getElementById('gi-'+id);
+  const open = body.classList.toggle('open');
+  icon.classList.toggle('open', open);
+}
+
+// ── PROGRESS ──────────────────────────────────────────────
+function renderProgress(){
+  const vals = Object.values(progress);
+  const totalCorrect = vals.reduce((s,v) => s+v.c, 0);
+  const totalWrong = vals.reduce((s,v) => s+v.w, 0);
+  const total = totalCorrect + totalWrong;
+  const acc = total > 0 ? Math.round(totalCorrect / total * 100) : 0;
+  const learned = vals.filter(v => v.c >= 3).length;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat"><div class="stat-label">Words tried</div><div class="stat-val">${vals.length}</div></div>
+    <div class="stat"><div class="stat-label">Total answers</div><div class="stat-val">${total}</div></div>
+    <div class="stat"><div class="stat-label">Accuracy</div><div class="stat-val">${acc}%</div></div>
+    <div class="stat"><div class="stat-label">Words learnt</div><div class="stat-val">${learned}</div></div>
+  `;
+
+  const cats = [...new Set(VOCAB.map(v => v.cat))];
+  document.getElementById('cat-progress').innerHTML = cats.map(cat => {
+    const words = VOCAB.filter(v => v.cat === cat);
+    const done = words.filter(w => progress[w.id] && progress[w.id].c >= 1).length;
+    const pct = Math.round(done / words.length * 100);
+    return `<div style="margin-bottom:14px">
+      <div class="cat-row">
+        <span class="tag ${cat}">${cat}</span>
+        <span style="color:var(--text2)">${done} / ${words.length}</span>
+      </div>
+      <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function resetProgress(){
+  if(confirm('Reset all progress? This cannot be undone.')){
+    progress = {};
+    saveProgress(progress);
+    renderProgress();
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────
+initFlashcards();
+renderGrammar();
+</script>
+</body>
+</html>
